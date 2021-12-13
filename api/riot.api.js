@@ -4,10 +4,10 @@ const header = {
     'X-Riot-Token': constants._valorantAPIKey,
 }
 module.exports = {
-    getValorantContent: function() {
+    getAccountByPuuid: function(puuid) {
         const options = {
             hostname: constants._valorantAPIUrl,
-            path: "/val/content/v1/contents",
+            path: "/riot/account/v1/accounts/by-puuid/" + puuid,
             method: "GET"
         }
         return new Promise((resolve, reject) => {
@@ -17,10 +17,10 @@ module.exports = {
             })
         })
     },
-    getMatchById: function(matchId) {
+    getAccountByRiotId: function(gameName, tagLine) {
         const options = {
             hostname: constants._valorantAPIUrl,
-            path: "/val/match/v1/matches/" + matchId,
+            path: "/riot/account/v1/accounts/by-riot-id/" + gameName + "/" + tagLine,
             method: "GET"
         }
         return new Promise((resolve, reject) => {
@@ -30,10 +30,24 @@ module.exports = {
             })
         })
     },
-    getMatchListByPuuid: function(puuid) {
+    getAccountByAccessToken: function(accessToken) {
         const options = {
             hostname: constants._valorantAPIUrl,
-            path: "/val/match/v1/matchlists/by-puuid/" + puuid,
+            path: "/riot/account/v1/accounts/me",
+            method: "GET"
+        }
+        const authHeader = { "Authorization": accessToken };
+        return new Promise((resolve, reject) => {
+            request(options.hostname + options.path, { headers: {...header, ...authHeader }, json: true }, (err, res, body) => {
+                if (err) reject(err);
+                resolve(body);
+            })
+        })
+    },
+    getPlayerActiveShard: function(game, puuid) {
+        const options = {
+            hostname: constants._valorantAPIUrl,
+            path: "/riot/account/v1/active-shards/by-game/" + game + "/by-puuid/" + puuid,
             method: "GET"
         }
         return new Promise((resolve, reject) => {
@@ -43,17 +57,4 @@ module.exports = {
             })
         })
     },
-    getRecentMatchesByQueue: function(queue) {
-        const options = {
-            hostname: constants._valorantAPIUrl,
-            path: "/val/match/v1/recent-matches/by-queue/" + queue,
-            method: "GET"
-        }
-        return new Promise((resolve, reject) => {
-            request(options.hostname + options.path, { headers: header, json: true }, (err, res, body) => {
-                if (err) reject(err);
-                resolve(body);
-            })
-        })
-    }
 }
